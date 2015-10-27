@@ -1,0 +1,12 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Flasky{% endblock %}
+
+{% block content %}
+<div class="container">
+	<div class="page-header">
+		{% block page-content %}
+		{% endblock %}
+	</div>
+</div>
+{% endblock %}
