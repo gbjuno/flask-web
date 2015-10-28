@@ -1,0 +1,4 @@
+Hello,  {{ username }}:
+     you have just register my blog, please click the url follow to confirm you account!
+     {{ confirm_url }}
+     Thank you!
