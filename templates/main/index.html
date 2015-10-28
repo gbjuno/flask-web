@@ -1,14 +1,4 @@
 {% extends "main/base.html" %}
-{% block navbar_right %}
-<ul class="nav navbar-nav navbar-right">
-	{% if current_user.is_authenticated %}
-	<li><a href="{{ url_for('auth.logout') }}">sign out</a></li>
-	{% else %}
-	<li><a href="{{ url_for('auth.login') }}">sign in</a></li>
-	{% endif %}
-</ul>
-{% endblock %}
-
 {% block page_content %}
 	{% if current_user.is_authenticated %}
 	hello, {{ user.username }}

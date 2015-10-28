@@ -34,6 +34,16 @@ class RegisterForm(Form):
 		if User.query.filter_by(email=field.data).first():
 			raise ValidationError('Email already in use')
 
+class ChangePasswordForm(Form):
+	oldpassword = PasswordField('old password', validators=[Required()])
+	newpassword = PasswordField('new password', validators=[Required(), EqualTo('newpassword_sec', message='Password must match')])
+	newpassword_sec = PasswordField('confirm new password', validators=[Required()])
+	submit = SubmitField('confirm')
+
+class ForgetPasswordForm(Form):
+	email = StringField('input your email address', validators=[Required(), Email()])
+	submit = SubmitField('send reset password email')
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 	form = LoginForm()
@@ -93,3 +103,36 @@ def unconfirmed():
 	if current_user.is_anonymous or current_user.confirmed:
 		return redirect('main.index')
 	return render_template('auth/unconfirm.html', user=current_user)
+
+@auth.route('/change_password', methods=['GET','POST'])
+@login_required
+def change_password():
+	form =  ChangePasswordForm()
+	if form.validate_on_submit():
+		oldpassword = form.oldpassword.data
+		if current_user.verify_password(oldpassword):
+			current_user.password = form.newpassword.data
+			db.session.add(current_user)
+			db.session.commit()
+			flash('Password change sucessful!')
+			return redirect(url_for('main.index'))
+		else:
+			flash('Please input correct old password!')
+	return render_template('auth/change_password.html', form=form)
+
+@auth.route('/forget_password', methods=['GET', 'POST'])
+def forget_password():
+	form = ForgetPasswordForm()
+	if form.validate_on_submit():
+		email = User.query.filter_by(email=form.email.data).first()
+		if email is not None:
+			send_mail(app=current_app, to=current_user.email,subject='Please reset your password, template='reset password', \
+				username=current_user.username, confirm_url=url_for('auth.confirm') + current_user.generate_confirmation_token())
+		else:
+			flash("invalid user email address.")
+	return render_template('auth/forget_password.html', form=form)
+
+@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password():
+	passs
+
