@@ -1,0 +1,53 @@
+{% extends "main/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block flash_message %}
+<div class="container">
+	{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		{{ message }}
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}
+
+{% block page_content %}
+<table class="table table-stripe">
+	<tr>
+		<th>attribute</th>
+		<th>value</th>
+	</tr>
+	<tr>
+		<td>username</td>
+		<td>{{ user.username }}</td>
+	</tr>
+	<tr>
+		<td>age</td>
+		<td>{{ user.age }}</td>
+	</tr>
+	<tr>
+		<td>email</td>
+		<td>{{ user.email }}</td>
+	</tr>
+	<tr>
+		<td>about me</td>
+		<td>{{ user.about_me }}</td>
+	</tr>
+	<tr>
+		<td>member since</td>
+		<td>{{ user.member_since }}</td>
+	</tr>
+	<tr>
+		<td>last seen</td>
+		<td>{{ user.last_seen }}</td>
+	</tr>
+</table>
+<p>
+{% if current_user.is_authenticated and current_user.is_administrator() %}
+<a class="btn btn-primary btn-lg" href="{{ url_for('main.adminedit', username=current_user.username) }}">edit profile [ADMIN]</a>
+{% elif current_user.is_authenticated and current_user == user %}
+<a class="btn btn-primary btn-lg" href="{{ url_for('main.useredit', username=current_user.username) }}">edit my profile</a>
+{% endif %}
+</p>
+{% endblock %}

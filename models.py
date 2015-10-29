@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf8 -*-
 
+from datetime import datetime
 from . import login_manager, db
 from flask import current_app, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -18,8 +19,10 @@ class User(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(64), unique=True, index=True)
 	password_hash = db.Column(db.String(128))
-	sex = db.Column(db.Boolean)
-	comment = db.Column(db.String(100))
+	about_me = db.Column(db.Text())
+	age = db.Column(db.Integer)
+	member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+	last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
 	email = db.Column(db.String(64), unique=True, index=True)
 	confirmed = db.Column(db.Boolean)
 	role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -31,7 +34,12 @@ class User(db.Model, UserMixin):
 				self.role = Role.query.filter_by(permissions=0xff).first()
 			if self.role is None:
 				self.role = Role.query.filter_by(default=True).first()
-		print self.role
+		self.member_since = datetime.utcnow()
+		db.session.add(self)
+		db.session.commit()
+
+	def ping(self):
+		self.last_seen = datetime.utcnow()
 		db.session.add(self)
 		db.session.commit()
 
@@ -99,6 +107,8 @@ class User(db.Model, UserMixin):
 	@password.setter
 	def password(self, password):
 		self.password_hash = generate_password_hash(password)
+
+
 
 class AnonymousUser(AnonymousUserMixin):
 	def can(self, permissions):

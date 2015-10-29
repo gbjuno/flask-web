@@ -1,0 +1,56 @@
+{% extends "main/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block flash_message %}
+<div class="container">
+	{% for message in get_flashed_messages() %}
+	<div class="alert alert-warning">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		{{ message }}
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% if current_user.is_administrator() %}
+	<table class="table table-stripe">
+		<tr>
+			<th>attribute</th>
+			<th>value</th>
+		</tr>
+		<tr>
+			<td>member since</td>
+			<td>{{ user.member_since }}</td>
+		</tr>
+		<tr>
+			<td>last seen</td>
+			<td>{{ user.last_seen }}</td>
+		</tr>
+	</table>
+	{{ wtf.quick_form(form) }}
+{% else %}
+	<table class="table table-stripe">
+		<tr>
+			<th>attribute</th>
+			<th>value</th>
+		</tr>
+		<tr>
+			<td>username</td>
+			<td>{{ user.username }}</td>
+		</tr>
+		<tr>
+			<td>email</td>
+			<td>{{ user.email }}</td>
+		</tr>
+			<td>member since</td>
+			<td>{{ user.member_since }}</td>
+		</tr>
+		<tr>
+			<td>last seen</td>
+			<td>{{ user.last_seen }}</td>
+		</tr>
+	</table>
+	{{ wtf.quick_form(form) }}
+{% endif %}
+{% endblock %}

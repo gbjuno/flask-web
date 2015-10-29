@@ -32,7 +32,7 @@ class appFactory(object):
 		from auth import auth as auth_blueprint
 		from admin import admin as admin_blueprint
 
-		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://flask:gf37888676@172.17.0.25/flask'
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://flask:86797121@localhost/flask'
 		app.config['SQLAlCHEMY_COMMIT_ON_TEARDOWN'] = True
 		app.config['FLASK_ADMIN'] = 'iamawar3player@163.com'
 		app.config['FLASK_MAIL_SUBJECT_PREFIX'] = '[Flasky]'
