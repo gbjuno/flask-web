@@ -10,9 +10,5 @@
 </div>
 {% endblock %}
 {% block page_content %}
-	{% if current_user.is_authenticated %}
-	hello, {{ user.username }}
-	{% else %}
-	hello,stranger
-	{% endif %}
+Welcome, Administrator!
 {% endblock %}

@@ -1,0 +1,4 @@
+Hello,  {{ username }}:
+    you have just reset your email, click underline url to confirm.
+    {{ resetemail_url }}
+    Thank you!

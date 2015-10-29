@@ -44,6 +44,15 @@ class ForgetPasswordForm(Form):
 	email = StringField('input your email address', validators=[Required(), Email()])
 	submit = SubmitField('send reset password email')
 
+class ResetPasswordForm(Form):
+	newpassword = PasswordField('new password', validators=[Required(), EqualTo('newpassword_sec', message='Password must match')])
+	newpassword_sec = PasswordField('confirm new password', validators=[Required()])
+	submit = SubmitField('confirm')
+
+class ResetEmailForm(Form):
+	newemail = StringField('input your newemail address', validators=[Required(), Email()])
+	submit = SubmitField('confirm')
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
 	form = LoginForm()
@@ -124,15 +133,50 @@ def change_password():
 def forget_password():
 	form = ForgetPasswordForm()
 	if form.validate_on_submit():
-		email = User.query.filter_by(email=form.email.data).first()
-		if email is not None:
-			send_mail(app=current_app, to=current_user.email,subject='Please reset your password, template='reset password', \
-				username=current_user.username, confirm_url=url_for('auth.confirm') + current_user.generate_confirmation_token())
+		user = User.query.filter_by(email=form.email.data).first()
+		if user is not None:
+			send_mail(app=current_app, to=user.email,subject='Please reset your password', template='reset_password', username=user.username, resetpassword_url='http://10.35.89.23/auth/reset_password/'+ user.generate_resetpassword_token())
+			return redirect(url_for('main.index'))
 		else:
 			flash("invalid user email address.")
 	return render_template('auth/forget_password.html', form=form)
 
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password():
-	passs
+def reset_password(token):
+	form = ResetPasswordForm()
+	id = User.verify_resetpassword_token(token)
+	if id is not None:
+		user = User.query.filter_by(id = id).first()
+		if form.validate_on_submit():
+			user.password = form.newpassword.data
+			db.session.add(user)
+			db.session.commit()
+			return redirect(url_for('auth.login'))
+		return render_template('auth/reset_password.html', form=form)
+	else:
+		flash('your reset password url is invalid or expired!')
+		return redirect('auth.login')
+
+@auth.route('/reset_email', methods=['GET', 'POST'])
+@login_required
+def reset_email():
+	form = ResetEmailForm()
+	if form.validate_on_submit():
+		newemail = form.newemail.data
+		send_mail(app=current_app, to=newemail,subject='Please confirm your changing email', template='reset_email', username=current_user.username, resetemail_url='http://10.35.89.23/auth/reset_email/'+ current_user.generate_resetemail_token(newemail))
+		flash('you need to login your old email to confirm the reset email operation')
+	return render_template('auth/reset_email.html',form=form)
+
+@auth.route('/reset_email/<token>')
+@login_required
+def reset_email_confirm(token):
+	newemail = current_user.verify_resetemail_token(token)
+	if newemail:
+		current_user.email = newemail
+		db.session.add(current_user)
+		db.session.commit()
+	else:
+		flash('your email reset confirm url is invalid or expired')
+		return redirect(url_for('main.index'))
+	return render_template('auth/reset_email_confirm.html')
 
