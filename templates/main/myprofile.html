@@ -45,7 +45,7 @@
 </table>
 <p>
 {% if current_user.is_authenticated and current_user.is_administrator() %}
-<a class="btn btn-primary btn-lg" href="{{ url_for('main.adminedit', username=current_user.username) }}">edit profile [ADMIN]</a>
+<a class="btn btn-primary btn-lg" href="{{ url_for('main.adminedit', username=user.username) }}">edit profile [ADMIN]</a>
 {% elif current_user.is_authenticated and current_user == user %}
 <a class="btn btn-primary btn-lg" href="{{ url_for('main.useredit', username=current_user.username) }}">edit my profile</a>
 {% endif %}
